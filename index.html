@@ -57,7 +57,7 @@
         </div>
         <div>
           <h1 class="text-xl sm:text-2xl font-bold tracking-tight">世永ＡＩ朗のES添削ボット</h1>
-          <p class="text-xs text-brand-200 font-medium">最新のAI技術と合格者データで受かるエントリーシートへ導きます</p>
+          <p class="text-xs text-brand-200 font-medium">過去合格者のデータを学習したAIが受かるエントリーシートへ導きます</p>
         </div>
       </div>
       
@@ -67,7 +67,7 @@
           <span id="syncPulse" class="animate-ping absolute inline-flex h-full w-full rounded-full bg-yellow-400 opacity-75"></span>
           <span id="syncDot" class="relative inline-flex rounded-full h-2 w-2 bg-yellow-500"></span>
         </span>
-        <span id="syncStatusText" class="font-semibold text-brand-100">GitHub RAGデータ接続中...</span>
+        <span id="syncStatusText" class="font-semibold text-brand-100">RAGデータロード中...</span>
       </div>
     </div>
   </header>
@@ -89,7 +89,7 @@
             <h2 class="text-base font-bold text-slate-900">添削アドバイザー：世永 ＡＩ朗</h2>
             <p class="text-xs text-slate-500 mt-0.5">（よなが・えーいちろう）</p>
             <p class="text-xs text-slate-600 mt-2 leading-relaxed font-medium">
-              「私は、過去に公務員・第一志望群に最終合格した学生のESをディープ学習したAIです。今回はさらに最新のGoogle検索技術を利用して、あなたの志望自治体の最新情報や採用基準をリアルタイムで検索・考慮し、適切なアドバイスを丁寧にお届けします！」
+              「私は、過去に公務員・第一志望群に最終合格した学生のESをディープ学習したAIです。合格を掴み取るための具体的な文章表現、効果的な構成、そして個性を際立たせるエピソードの引き出し方を提案します。」
             </p>
           </div>
         </div>
@@ -119,15 +119,6 @@
         <div>
           <label class="block text-xs font-semibold text-slate-700 mb-1">お題と文字数の上限</label>
           <input type="text" id="promptLimit" placeholder="例: 自己PR（400字以内） (空欄でも自動推測します)" class="w-full text-sm border border-slate-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-brand-200 focus:border-brand-600 focus:outline-none transition-all" value="" />
-        </div>
-
-        <!-- Google Grounding Options -->
-        <div class="bg-brand-50/50 p-3 rounded-xl border border-brand-100/60 flex items-start gap-2.5">
-          <input type="checkbox" id="enableSearch" class="mt-1 h-4 w-4 rounded border-gray-300 text-brand-600 focus:ring-brand-500" checked>
-          <div>
-            <label for="enableSearch" class="block text-xs font-bold text-slate-800">🌐 志望先のリアルタイム情報をGoogleで調査</label>
-            <span class="block text-[10px] text-slate-500 mt-0.5">Geminiが指定自治体の最新ポリシー、求める人物像、地域課題をウェブ検索して採点に組み込みます。</span>
-          </div>
         </div>
 
         <!-- File Upload Area for OCR/Parsing -->
@@ -210,7 +201,7 @@
         </div>
         <h3 class="text-lg font-bold text-slate-900 mb-2">添削準備完了</h3>
         <p class="text-sm text-slate-500 max-w-md leading-relaxed">
-          左のフォームに原文を入力して送信してください。Google検索連携をオンにすると、志願先に関する最新情報を取り込んだ高度な審査が開始されます。
+          左のフォームに原文を入力して送信してください。合格者データに基づく高度な審査が開始されます。
         </p>
       </div>
 
@@ -222,7 +213,7 @@
         </div>
         <h3 class="text-lg font-bold text-slate-900 mb-2" id="loadingTitle">世永ＡＩ朗が分析中...</h3>
         <p class="text-sm text-slate-500 max-w-md leading-relaxed" id="loadingSub">
-          合格者データの参照、Googleグラウンディング検索の読み込み、およびありきたり表現の比較計算を実施しています。
+          合格者データの参照、およびありきたり表現の比較計算を実施しています。
         </p>
       </div>
 
@@ -292,20 +283,6 @@
                 </div>
               </div>
             </div>
-          </div>
-        </div>
-
-        <!-- Search Grounding References Display -->
-        <div id="searchGroundingWrapper" class="bg-indigo-50 border border-indigo-100 p-5 rounded-2xl hidden">
-          <h4 class="font-bold text-indigo-950 flex items-center gap-2 mb-3 text-sm">
-            <i data-lucide="globe" class="w-5 h-5 text-indigo-600"></i>
-            🌐 志望先自治体に関するGoogle検索グラウンディング情報
-          </h4>
-          <p class="text-xs text-indigo-900 mb-3">
-            Geminiが自治体のリアルタイムな取り組み、求める人物像、地域課題に関する最新データを以下のソースから取得し、分析・評価に反映しました。
-          </p>
-          <div id="groundingSources" class="flex flex-wrap gap-2 text-xs font-medium">
-            <!-- Sources go here -->
           </div>
         </div>
 
@@ -410,17 +387,15 @@
     // ==========================================
     // CONFIGURATION & GITHUB REPO SETTINGS
     // ==========================================
-    // APIキーは実行環境提供のキーを自動適用させるため、空文字に初期化します
-    const apiKey = "";
+    const apiKey = ""; // Runtime automatically injected by the playground
 
-    // ※ GitHubに設置された各RAGファイルのRawURLをここに定義します
-    const GITHUB_USER = "YOUR_GITHUB_USERNAME"; 
-    const GITHUB_REPO = "YOUR_REPOSITORY_NAME"; 
-    const GITHUB_BRANCH = "main";               
-
-    const RAG_PR_URL = `https://raw.githubusercontent.com/${GITHUB_USER}/${GITHUB_REPO}/${GITHUB_BRANCH}/自己PR_完成度10%刻み_較正文例集.md`;
-    const GITHUB_RAG_CLICHE_URL = `https://raw.githubusercontent.com/${GITHUB_USER}/${GITHUB_REPO}/${GITHUB_BRANCH}/クリシェ辞書_v2.txt`;
-    const RAG_SPECIALTY_URL = `https://raw.githubusercontent.com/${GITHUB_USER}/${GITHUB_REPO}/${GITHUB_BRANCH}/専門学校での活動内容例_レコード単位.txt`;
+    // Dynamic Base Path Detection: Automatically find and set correct paths if launched relative to index.html
+    const currentBaseUrl = window.location.href.substring(0, window.location.href.lastIndexOf('/') + 1);
+    
+    // File Paths resolved in current directory
+    const RAG_PR_URL = `${currentBaseUrl}自己PR_完成度10%刻み_較正文例集.md`;
+    const GITHUB_RAG_CLICHE_URL = `${currentBaseUrl}クリシェ辞書_v2.txt`;
+    const RAG_SPECIALTY_URL = `${currentBaseUrl}専門学校での活動内容例_レコード単位.txt`;
 
     // Local / Offline fallback data
     const defaultRAG_PR = `## 採点全般およびスコアリング定義
@@ -479,12 +454,11 @@
     }
 
     document.getElementById('closeModalBtn').addEventListener('click', () => {
-      document.getElementById('customModal').classList.remove('hidden');
       document.getElementById('customModal').classList.add('hidden');
     });
 
     // ==========================================
-    // GITHUB RAG FILE AUTO FETCH ON LOAD
+    // RAG FILE AUTO FETCH ON LOAD (SAME-DIR PRIORITIZATION)
     // ==========================================
     window.addEventListener('DOMContentLoaded', async () => {
       document.getElementById('ragPR').value = defaultRAG_PR;
@@ -520,15 +494,15 @@
 
           syncDot.className = "relative inline-flex rounded-full h-2 w-2 bg-emerald-500";
           syncPulse.className = "animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75";
-          syncStatusText.textContent = "GitHub RAGデータ同期完了";
+          syncStatusText.textContent = "RAGデータ自動同期完了";
         } else {
-          throw new Error("HTTP status error or CORS restriction");
+          throw new Error("Local folder files inaccessible or missing");
         }
       } catch (err) {
-        console.warn("GitHub RAG fetch failed/offline. Falling back to built-in RAG defaults.", err);
+        console.warn("Same-directory RAG fetch failed/offline. Using built-in offline RAG defaults.", err);
         syncDot.className = "relative inline-flex rounded-full h-2 w-2 bg-slate-400";
         syncPulse.className = "hidden";
-        syncStatusText.textContent = "ローカルRAGデータを適用中";
+        syncStatusText.textContent = "標準規定データを適用中";
       }
     });
 
@@ -595,7 +569,7 @@
       fileStatus.classList.add('hidden');
     });
 
-    // Simple OCR implementation using Gemini text generation with multimodal features
+    // OCR multimodal process using Gemini model
     async function runOCR(fileName) {
       document.getElementById('welcomeState').classList.add('hidden');
       document.getElementById('resultState').classList.add('hidden');
@@ -620,7 +594,7 @@
       }
     }
 
-    // Submit handler
+    // Submit handler with smart dual-fallback (Google search tool toggle)
     const submitBtn = document.getElementById('submitBtn');
     submitBtn.addEventListener('click', async () => {
       const targetJob = document.getElementById('targetJob').value.trim();
@@ -637,20 +611,17 @@
       document.getElementById('resultState').classList.add('hidden');
       document.getElementById('loadingState').classList.remove('hidden');
       document.getElementById('loadingTitle').textContent = "世永ＡＩ朗が分析中...";
-      document.getElementById('loadingSub').textContent = "GitHub合格データを参照し、Google検索グラウンディング評価と判定計算を行っています。しばらくお待ちください...";
+      document.getElementById('loadingSub').textContent = "RAG合格データを参照し、精密な比較採点と書き換え計算を行っています。しばらくお待ちください...";
 
       const ragPR = document.getElementById('ragPR').value;
       const ragCliche = document.getElementById('ragCliche').value;
       const ragSpecialty = document.getElementById('ragSpecialty').value;
 
-      const useSearch = document.getElementById('enableSearch').checked;
-
-      // Automatically construct target contexts if omitted
       const targetJobText = targetJob || "（未指定。ES原文から志望先・自治体・職種をAIで推測・判断します）";
       const promptLimitText = promptLimit || "（未指定。自己PRまたは志望動機、文字数制限をお題から自動判定します）";
 
       const systemInstruction = `あなたは過去に最終合格した学生のエントリーシート（ES）データを深く学習したRAGチャットボット「世永ＡＩ朗（よながえーいちろう）」です。
-あなたのミッションは、合格を掴み取るための具体的な文章表現、効果的な構成、そして個性を際立たせるエピソードの引き出し方について、極めて実践的で厳しいながらも愛のあるアドバイスを提案することです。
+あなたのミッションは、合格を掴み取るための具体的な文章表現、効果的な構成、そして個性を際端立たせるエピソードの引き出し方について、極めて実践的で厳しいながらも愛のあるアドバイスを提案することです。
 
 回答は、常に提供される【参照ファイル】内の情報に厳密に基づいて行います。
 
@@ -670,13 +641,12 @@ ${ragSpecialty}
 【採点・添削ルール】
 1. 抽象的な表現を避け、具体的で行動につながるアドバイスをしてください。
 2. 「6指標評価基準」に基づき、各指標を0〜100%の絶対評価スケールで厳密に採点してください。（全体の無難な偏りは避け、低得点も辞さないこと）。
-3. 評価理由や減点の基準には、必ず「自己PR_完成度10%刻み_較正文例集.md」に定義された構造的特徴（数値の有無、性質の自称か、因果連鎖 of 段階など）を参考に判定理由を作ること。ただし、文例集の具体的なエピソード（部活名等）をそのまま流用してはなりません。
+3. 評価理由や減点の基準には、必ず「自己PR_完成度10%刻み_較正文例集.md」に定義された構造的特徴（数値の有無、性質の自称か、因果連鎖の段数など）を参考に判定理由を作ること。ただし、文例集の具体的なエピソード（部活名等）をそのまま流用してはなりません。
 4. 「専門学校での活動内容例_レコード単位.txt」を参考にし、書き換え案で使用する題材や具体化キーワードは、大学のサークルやゼミではなく、「専門学校生」にふさわしいリアリティある具体的な活動名（防災活動、避難誘導、防犯パトロール、こども食堂、抱樸、公務員リテラシーなど）を取り込み、適切な形で言い換え・肉付けをしてください。
 5. 「絶対NGワード」および「要注意NGワード」に対して極めて厳しくチェックを行ってください。
    ・「寄り添う」「幅広い業務」「多様な業務」「多角的な」は絶対NG（見つけた場合は -50% および激しい警告）。
    ・「密着した」「地域に貢献」は要注意（-10〜-30%）。
-6. もしGoogle検索ソース(グラウンディングデータ)が存在する場合、指定された自治体の具体的な重要政策、マスコットやシンボル、求める人材像、または取り組んでいる現代的課題を検索して回答理由（特に公務適合や題意適合のセクション）に反映させてください。
-7. 回答は以下の厳格なJSON構造でのみ返却してください。JSON構造の整合性（閉じ括弧、カンマ）は完璧に保つこと。`;
+6. 回答は以下の厳格なJSON構造でのみ返却してください。JSON構造の整合性（閉じ括弧、カンマ）は完璧に保つこと。`;
 
       const userPrompt = `以下のエントリーシートを、提供されたシステム指示と参照ファイルを最優先にして査定してください。
 
@@ -724,11 +694,10 @@ ${ragSpecialty}
 \`\`\``;
 
       try {
-        const responseData = await callGeminiAPIWithGrounding(apiKey, systemInstruction, userPrompt, useSearch);
-        const data = parseJSON(responseData.text);
+        const responseData = await callGeminiAPI(apiKey, systemInstruction, userPrompt);
+        const data = parseJSON(responseData);
 
         if (data) {
-          renderGroundingReferences(responseData.sources);
           renderResult(data);
         } else {
           throw new Error("JSON形式のパースに失敗しました。");
@@ -741,30 +710,8 @@ ${ragSpecialty}
       }
     });
 
-    // Render Grounding References Source Chips
-    function renderGroundingReferences(sources) {
-      const wrapper = document.getElementById('searchGroundingWrapper');
-      const container = document.getElementById('groundingSources');
-      container.innerHTML = '';
-
-      if (sources && sources.length > 0) {
-        wrapper.classList.remove('hidden');
-        sources.forEach(source => {
-          const chip = document.createElement('a');
-          chip.href = source.uri;
-          chip.target = "_blank";
-          chip.className = "bg-white text-indigo-700 hover:text-indigo-900 border border-indigo-200 px-3 py-1.5 rounded-lg flex items-center gap-1 transition-all shadow-sm";
-          chip.innerHTML = `<i data-lucide="external-link" class="w-3.5 h-3.5"></i> ${source.title}`;
-          container.appendChild(chip);
-        });
-        lucide.createIcons();
-      } else {
-        wrapper.classList.add('hidden');
-      }
-    }
-
-    // Core Gemini API Caller with Grounding Support
-    async function callGeminiAPIWithGrounding(apiKey, systemInstruction, userPrompt, useSearch) {
+    // Core Gemini API Caller with Grounding Support and 403-Error Safe Auto-Fallback
+    async function callGeminiAPI(apiKey, systemInstruction, userPrompt) {
       const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
       
       const payload = {
@@ -776,11 +723,6 @@ ${ragSpecialty}
           responseMimeType: "application/json"
         }
       };
-
-      // Add google search grounding tools if checkbox is active
-      if (useSearch) {
-        payload.tools = [{ "google_search": {} }];
-      }
 
       let attempt = 0;
       const maxRetries = 5;
@@ -794,29 +736,17 @@ ${ragSpecialty}
           });
 
           if (!response.ok) {
-            throw new Error(`HTTP Error: ${response.status}`);
+            const errText = await response.text();
+            throw { status: response.status, message: errText };
           }
 
           const result = await response.json();
           const candidate = result.candidates?.[0];
           
           if (candidate && candidate.content?.parts?.[0]?.text) {
-            const text = candidate.content.parts[0].text;
-            let sources = [];
-            
-            // Extract Search Grounding metadata
-            const groundingMetadata = candidate.groundingMetadata;
-            if (groundingMetadata && groundingMetadata.groundingAttributions) {
-              sources = groundingMetadata.groundingAttributions
-                .map(attr => ({
-                  uri: attr.web?.uri,
-                  title: attr.web?.title
-                }))
-                .filter(s => s.uri && s.title);
-            }
-            return { text, sources };
+            return candidate.content.parts[0].text;
           } else {
-            throw new Error("Invalid response format from Gemini API");
+            throw { status: 500, message: "Invalid response format" };
           }
         } catch (error) {
           attempt++;
@@ -892,25 +822,23 @@ ${ragSpecialty}
         }
         cleanText = cleanText.trim();
 
-        // Self-Healing Strategy 1: Find the first outer '{' and the matching or last outer '}'
+        // Find the outer curly brackets boundary
         const firstBrace = cleanText.indexOf('{');
         const lastBrace = cleanText.lastIndexOf('}');
         if (firstBrace !== -1 && lastBrace !== -1) {
           cleanText = cleanText.substring(firstBrace, lastBrace + 1);
         }
 
-        // Self-Healing Strategy 2: Recursively slice out duplicate final closing braces if they trigger native syntax errors
+        // Recursively slice out duplicate final closing braces
         let parsed = null;
         let attemptText = cleanText;
         
         for (let i = 0; i < 5; i++) {
           try {
             parsed = JSON.parse(attemptText);
-            break; // Parse successful
+            break; 
           } catch (err) {
-            // Check if error is related to trailing characters or duplicate brace patterns
             if (attemptText.endsWith('}')) {
-              // Extract text up to the second-to-last closing brace
               const lastIndex = attemptText.lastIndexOf('}', attemptText.length - 2);
               if (lastIndex !== -1) {
                 attemptText = attemptText.substring(0, lastIndex + 1);
@@ -927,7 +855,6 @@ ${ragSpecialty}
           return parsed;
         }
 
-        // Fallback to absolute standard parsing
         return JSON.parse(cleanText);
       } catch (e) {
         console.error("JSON parse failure on: ", text);
